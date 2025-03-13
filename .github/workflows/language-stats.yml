@@ -1,0 +1,36 @@
+name: Update Language Stats
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs once per day
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Repositories and Language Stats
+        run: |
+          curl -s "https://api.github.com/users/${{ github.repository_owner }}/repos" | jq '.[].languages_url' | xargs -n1 curl -s | jq -s 'add' > languages.json
+
+      - name: Format Language Stats
+        run: |
+          cat languages.json | jq 'to_entries | map({(.key): (.value / 1024 | floor)}) | add' > language_stats.json
+
+      - name: Update README
+        run: |
+          echo "# Language Stats" > README.md
+          echo "\`\`\`json" >> README.md
+          cat language_stats.json >> README.md
+          echo "\`\`\`" >> README.md
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.name "GitHub Action"
+          git config --local user.email "action@github.com"
+          git add README.md
+          git commit -m "Update language stats"
+          git push

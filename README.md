@@ -1,16 +1,25 @@
-## Hi there 👋
-
-<!--
-**ariel-logos/ariel-logos** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-
-Here are some ideas to get you started:
-
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+# Language Stats
+```json
+{
+  "Lua": 18,
+  "C#": 50073,
+  "HLSL": 7,
+  "ShaderLab": 550,
+  "Objective-C": 117,
+  "Objective-C++": 23,
+  "C++": 3,
+  "GAP": 9,
+  "C": 4,
+  "Python": 1,
+  "Shell": 0,
+  "CMake": 0,
+  "JavaScript": 11,
+  "Swift": 0,
+  "SCSS": 35,
+  "Liquid": 33,
+  "CSS": 5,
+  "HTML": 2,
+  "Ruby": 1,
+  "Dockerfile": 0
+}
+```

@@ -1,41 +1,45 @@
 name: Update Language Stats
 
 on:
-  schedule:
-    - cron: "0 0 * * *" # Runs once per day
-  workflow_dispatch: # Allows manual trigger
+  push:
+    branches:
+      - main
 
 jobs:
-  update-stats:
+  update-language-stats:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v3
+    - name: Check out the repository
+      uses: actions/checkout@v2
 
-      - name: Fetch Repositories and Language Stats
-        run: |
-          curl -s "https://api.github.com/users/${{ github.repository_owner }}/repos" \
-          | jq -r '.[].languages_url' \
-          | xargs -n1 -I {} curl -s {} \
+    - name: Set up Git configuration
+      run: |
+        git config --local user.name "GitHub Action"
+        git config --local user.email "action@github.com"
+
+    - name: Fetch Repositories and Language Stats
+      run: |
+        echo "Fetching repository list..."
+        curl -s "https://api.github.com/users/${{ github.repository_owner }}/repos" \
+          | jq -r '.[].languages_url' > urls.txt
+        echo "Fetched URLs:"
+        cat urls.txt
+
+        echo "Fetching language stats..."
+        xargs -n1 -I {} curl -s {} < urls.txt \
           | jq -s 'add' > languages.json
-          echo "Language stats fetched:"
-          cat languages.json
 
-      - name: Format Language Stats
-        run: |
-          cat languages.json | jq 'to_entries | map({(.key): (.value / 1024 | floor)}) | add' > language_stats.json
+        echo "Language stats fetched:"
+        cat languages.json
 
-      - name: Update README
-        run: |
-          echo "# Language Stats" > README.md
-          echo "\`\`\`json" >> README.md
-          cat language_stats.json >> README.md
-          echo "\`\`\`" >> README.md
-
-      - name: Commit and Push Changes
-        run: |
-          git config --local user.name "GitHub Action"
-          git config --local user.email "action@github.com"
-          git add language_stats.json languages.json
+    - name: Commit and Push Changes
+      run: |
+        # Check if the files have changed
+        if git diff --exit-code languages.json; then
+          echo "No changes in language stats, skipping commit."
+        else
+          git add languages.json
           git commit -m "Update language stats"
           git push
+        fi
